@@ -16,7 +16,7 @@ sort_directions = {
 def th(parser, token):
     """
     Parses a tag that's supposed to be in this format:
-    {% sth field title%}    
+    {% th field title %}    
     """
     bits = token.contents.split()
     if len(bits) < 2:
