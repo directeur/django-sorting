@@ -4,10 +4,13 @@ from django.conf import settings
 
 register = template.Library()
 
+DEFAULT_SORT_UP = getattr(settings, 'DEFAULT_SORT_UP' , '&uarr;')
+DEFAULT_SORT_DOWN = getattr(settings, 'DEFAULT_SORT_DOWN' , '&darr;')
+
 sort_directions = {
-    'asc': {'inverse': 'desc'}, 
-    'desc': {'inverse': 'asc'}, 
-    '': {'inverse': 'asc'}, 
+    'asc': {'icon':DEFAULT_SORT_UP, 'inverse': 'desc'}, 
+    'desc': {'icon':DEFAULT_SORT_DOWN, 'inverse': 'asc'}, 
+    '': {'icon':DEFAULT_SORT_DOWN, 'inverse': 'asc'}, 
 }
 
 def anchor(parser, token):
@@ -55,10 +58,14 @@ class SortAnchorNode(template.Node):
             sortdir = ''
         if sortby == self.field:
             getvars['dir'] = sort_directions[sortdir]['inverse']
+            icon = sort_directions[sortdir]['icon']
+        else:
+            icon = ''
         if len(getvars.keys()) > 0:
             urlappend = "&%s" % getvars.urlencode()
         else:
             urlappend = ''
+        self.title = "%s %s" % (self.title, icon)
 
         url = '%s?sort=%s%s' % (request.path, self.field, urlappend)
         return '<a href="%s" title="%s">%s</a>' % (url, self.title, self.title)
@@ -89,6 +96,6 @@ class SortedDataNode(template.Node):
 
         return ''
 
-th = register.tag(th)
+anchor = register.tag(anchor)
 autosort = register.tag(autosort)
 
