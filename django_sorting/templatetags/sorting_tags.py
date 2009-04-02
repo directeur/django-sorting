@@ -4,40 +4,36 @@ from django.conf import settings
 
 register = template.Library()
 
-DEFAULT_SORT_UP = getattr(settings, 'DEFAULT_SORT_UP' , '&uarr;')
-DEFAULT_SORT_DOWN = getattr(settings, 'DEFAULT_SORT_DOWN' , '&darr;')
-
 sort_directions = {
-    'asc': {'icon':DEFAULT_SORT_UP, 'inverse':'desc'}, 
-    'desc': {'icon':DEFAULT_SORT_DOWN, 'inverse':'asc'}, 
-    '': {'icon':DEFAULT_SORT_DOWN, 'inverse':'asc'}, 
+    'asc': {'inverse': 'desc'}, 
+    'desc': {'inverse': 'asc'}, 
+    '': {'inverse': 'asc'}, 
 }
 
-def th(parser, token):
+def anchor(parser, token):
     """
-    Parses a tag that's supposed to be in this format:
-    {% th field title %}    
+    Parses a tag that's supposed to be in this format: {% anchor field title %}    
     """
     bits = token.contents.split()
     if len(bits) < 2:
-        raise TemplateSyntaxError, "th tag takes at least 1 argument"
+        raise TemplateSyntaxError, "anchor tag takes at least 1 argument"
     try:
         title = bits[2]
     except IndexError:
         title = bits[1].capitalize()
-    return SortHeaderNode(bits[1].strip(), title.strip())
+    return SortAnchorNode(bits[1].strip(), title.strip())
     
 
-class SortHeaderNode(template.Node):
+class SortAnchorNode(template.Node):
     """
-    Renedrs a <th> HTML tag with a link which href attribute 
+    Renders an <a> HTML tag with a link which href attribute 
     includes the field on which we sort and the direction.
     and adds an up or down arrow if the field is the one 
     currently being sorted on.
 
     Eg.
-        {% th name Name %} generates
-        <th><a href="?sort=name" title="Name">Name</a></th>
+        {% anchor name Name %} generates
+        <a href="/the/current/path/?sort=name" title="Name">Name</a>
 
     """
     def __init__(self, field, title):
@@ -45,7 +41,8 @@ class SortHeaderNode(template.Node):
         self.title = title
 
     def render(self, context):
-        getvars = context['request'].GET.copy()
+        request = context['request']
+        getvars = request.GET.copy()
         if 'sort' in getvars:
             sortby = getvars['sort']
             del getvars['sort']
@@ -58,18 +55,13 @@ class SortHeaderNode(template.Node):
             sortdir = ''
         if sortby == self.field:
             getvars['dir'] = sort_directions[sortdir]['inverse']
-            icon = sort_directions[sortdir]['icon']
-        else:
-            icon = ''
         if len(getvars.keys()) > 0:
             urlappend = "&%s" % getvars.urlencode()
         else:
             urlappend = ''
-        self.title = "%s %s" % (self.title, icon)
 
-        url = '?sort=%s%s' % (self.field, urlappend)
-        return '<th><a href="%s" title="%s">%s</a></th>' % (url, self.title,
-                self.title)
+        url = '%s?sort=%s%s' % (request.path, self.field, urlappend)
+        return '<a href="%s" title="%s">%s</a>' % (url, self.title, self.title)
 
 
 def autosort(parser, token):
@@ -80,8 +72,7 @@ def autosort(parser, token):
 
 class SortedDataNode(template.Node):
     """
-        automatically sort a queryset with 
-        {% autosort queryset %}
+    Automatically sort a queryset with {% autosort queryset %}
     """
     def __init__(self, queryset_var, context_var=None):
         self.queryset_var = template.Variable(queryset_var)
@@ -97,7 +88,6 @@ class SortedDataNode(template.Node):
             context[key] = value
 
         return ''
-
 
 th = register.tag(th)
 autosort = register.tag(autosort)

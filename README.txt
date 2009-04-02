@@ -48,8 +48,8 @@ There are really 5 steps to setting it up with your projects.
 your objects_list:
    
     <tr>
-       {% th first_name Name %}
-       {% th creation_date Creation %}
+       <th>{% anchor first_name Name %}</th>
+       <th>{% anchor creation_date Creation %}</th>
         ...
     </tr>
 
@@ -58,8 +58,8 @@ your objects_list:
     snippet will be rendered like this:
 
     <tr>
-        <th><a href="?sort=first_name" title="Name">Name</a></th>
-        <th><a href="?sort=creation_date" title="Name">Creation</a></th>
+        <th><a href="/path/to/your/view/?sort=first_name" title="Name">Name</a></th>
+        <th><a href="/path/to/your/view/?sort=creation_date" title="Name">Creation</a></th>
         ...
     </tr>
 
