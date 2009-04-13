@@ -6,6 +6,8 @@ register = template.Library()
 
 DEFAULT_SORT_UP = getattr(settings, 'DEFAULT_SORT_UP' , '&uarr;')
 DEFAULT_SORT_DOWN = getattr(settings, 'DEFAULT_SORT_DOWN' , '&darr;')
+INVALID_FIELD_RAISES_404 = getattr(settings, 
+        'SORTING_INVALID_FIELD_RAISES_404' , False)
 
 sort_directions = {
     'asc': {'icon':DEFAULT_SORT_UP, 'inverse': 'desc'}, 
@@ -93,7 +95,13 @@ class SortedDataNode(template.Node):
         value = self.queryset_var.resolve(context)
         order_by = context['request'].field
         if len(order_by) > 1:
-            context[key] = value.order_by(order_by)
+            try:
+                context[key] = value.order_by(order_by)
+            except template.TemplateSyntaxError:
+                if INVALID_FIELD_RAISES_404:
+                    raise Http404('Invalid field sorting. If DEBUG were set to ' +
+                    'False, an HTTP 404 page would have been shown instead.')
+                context[key] = value
         else:
             context[key] = value
 
