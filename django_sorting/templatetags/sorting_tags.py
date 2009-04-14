@@ -19,7 +19,7 @@ def anchor(parser, token):
     """
     Parses a tag that's supposed to be in this format: {% anchor field title %}    
     """
-    bits = token.contents.split()
+    bits = [b.strip('"\'') for b in token.split_contents()]
     if len(bits) < 2:
         raise TemplateSyntaxError, "anchor tag takes at least 1 argument"
     try:
@@ -77,7 +77,7 @@ class SortAnchorNode(template.Node):
 
 
 def autosort(parser, token):
-    bits = token.contents.split()
+    bits = [b.strip('"\'') for b in token.split_contents()]
     if len(bits) != 2:
         raise TemplateSyntaxError, "autosort tag takes exactly one argument"
     return SortedDataNode(bits[1])
