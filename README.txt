@@ -1,7 +1,7 @@
 How to use django-sorting
 ----------------------------
 
-``django-sorting`` allows for easy sorting, and tables headers (<th>) generation 
+``django-sorting`` allows for easy sorting, and sorting links generation 
 without modifying your views.
 
 There are really 5 steps to setting it up with your projects.
@@ -11,7 +11,7 @@ There are really 5 steps to setting it up with your projects.
    
        INSTALLED_APPS = (
            # ...
-           'sorting',
+           'django_sorting',
        )
 
 2. Install the sorting middleware. Your settings file might look something
@@ -19,7 +19,7 @@ There are really 5 steps to setting it up with your projects.
    
        MIDDLEWARE_CLASSES = (
            # ...
-           'sorting.middleware.SortingMiddleware',
+           'django_sorting.middleware.SortingMiddleware',
        )
 
 3. If it's not already added in your setup, add the request context processor.
