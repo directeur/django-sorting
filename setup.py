@@ -85,10 +85,9 @@ setup(
     ],
     keywords='sorting,pagination,django',
     author='directeur',
-    url='http://github.com/ericflo/django-sorting/tree/master',
+    url='http://github.com/directeur/django-sorting/tree/master',
     license='BSD',
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=['setuptools'],
 )
